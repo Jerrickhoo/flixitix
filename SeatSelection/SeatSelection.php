@@ -1,6 +1,17 @@
 <?php
 
 include(__DIR__ . "/../db.php");
+session_start();
+$profile_picture = '../Avatar/Placeholder2.png';
+if (isset($_SESSION['user_email'])) {
+  $user_email = $_SESSION['user_email'];
+  $stmt = $conn->prepare("SELECT profile_picture FROM users WHERE email = ?");
+  $stmt->bind_param("s", $user_email);
+  $stmt->execute();
+  $stmt->bind_result($pic);
+  if ($stmt->fetch() && $pic) $profile_picture = $pic;
+  $stmt->close();
+}
 
 // Get parameters from URL
 $movie_id = isset($_GET['movie_id']) ? intval($_GET['movie_id']) : 0;
@@ -66,7 +77,7 @@ if ($movie_id && $cinema_id && $screen_id && $show_date && $show_time) {
 
     <div class="header-profile">
       <a href="../ProfilePage/ProfilePage.php" class="header-profile-link-rect" aria-label="Go to Profile Page">
-        <img src="../Pictures/Placeholder2.png" alt="User Profile" class="header-pfp">
+        <img src="<?php echo htmlspecialchars($profile_picture); ?>" alt="User Profile" class="header-pfp">
         <span class="header-profile-text">Profile</span>
       </a>
     </div>

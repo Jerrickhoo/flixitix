@@ -11,13 +11,14 @@ if (!isset($_SESSION['user_email'])) {
   exit();
 }
 
-// Handle bio and name update
+// Handle bio, name, and profile picture update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_bio'])) {
   $new_bio = trim($_POST['bio']);
   $new_name = trim($_POST['name']);
+  $new_avatar = isset($_POST['profile_picture']) ? $_POST['profile_picture'] : '';
   $user_email = $_SESSION['user_email'];
-  $stmt = $conn->prepare("UPDATE users SET bio = ?, name = ? WHERE email = ?");
-  $stmt->bind_param("sss", $new_bio, $new_name, $user_email);
+  $stmt = $conn->prepare("UPDATE users SET bio = ?, name = ?, profile_picture = ? WHERE email = ?");
+  $stmt->bind_param("ssss", $new_bio, $new_name, $new_avatar, $user_email);
   $stmt->execute();
   $stmt->close();
 }
@@ -42,6 +43,8 @@ $stmt->execute();
 $user_result = $stmt->get_result();
 $user = $user_result->fetch_assoc();
 $stmt->close();
+// Set profile picture (default if not set)
+$profile_picture = isset($user['profile_picture']) && $user['profile_picture'] ? $user['profile_picture'] : '../Pictures/Placeholder2.png';
 
 // Fetch user's bookings (most recent first), grouped by booking action (all seats booked together)
 $bookings = [];
@@ -121,7 +124,7 @@ $stmt->close();
     <section class="profile-section">
       <div class="profile-header">
         <div class="profile-avatar">
-          <img src="../Pictures/Placeholder2.png" alt="Profile Picture" class="profile-picture-img" />
+          <img src="<?php echo htmlspecialchars($profile_picture); ?>" alt="Profile Picture" class="profile-picture-img" />
         </div>
         <div class="profile-info">
           <div class="profile-top">
@@ -143,6 +146,23 @@ $stmt->close();
               <input type="text" id="edit-name" name="name" value="<?php echo htmlspecialchars($user['name'] ?? ''); ?>" placeholder="<?php echo htmlspecialchars($user['email']); ?>" required style="width:100%;max-width:400px;"><br>
               <label for="edit-bio"><strong>Bio:</strong></label><br>
               <textarea id="edit-bio" name="bio" rows="3" required><?php echo htmlspecialchars($user['bio'] ?? ''); ?></textarea><br>
+              <label><strong>Profile Picture:</strong></label><br>
+              <div class="avatar-selection" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+                <?php
+                  $avatar_dir = __DIR__ . '/../Avatar/';
+                  $avatar_files = array_values(array_filter(scandir($avatar_dir), function($f) use ($avatar_dir) {
+                    return preg_match('/\.(png|jpg|jpeg)$/i', $f) && is_file($avatar_dir . $f);
+                  }));
+                  foreach ($avatar_files as $avatar) {
+                    $avatar_path = '../Avatar/' . $avatar;
+                    $checked = ($profile_picture === $avatar_path) ? 'checked' : '';
+                    echo '<label style="display:inline-block;text-align:center;cursor:pointer;">';
+                    echo '<input type="radio" name="profile_picture" value="' . htmlspecialchars($avatar_path) . '" style="display:block;margin:auto;" ' . $checked . '>';
+                    echo '<img src="' . htmlspecialchars($avatar_path) . '" alt="avatar" style="width:48px;height:48px;border-radius:50%;border:2px solid #ccc;margin:4px 0;">';
+                    echo '</label>';
+                  }
+                ?>
+              </div>
               <button type="submit" name="save_bio">Save</button>
               <button type="button" id="cancel-edit-bio">Cancel</button>
             </form>
