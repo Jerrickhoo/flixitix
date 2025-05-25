@@ -11,12 +11,14 @@ if (!isset($_SESSION['user_email'])) {
   exit();
 }
 
-// Handle bio update
+// Handle bio, name, and profile picture update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_bio'])) {
   $new_bio = trim($_POST['bio']);
+  $new_name = trim($_POST['name']);
+  $new_avatar = isset($_POST['profile_picture']) ? $_POST['profile_picture'] : '';
   $user_email = $_SESSION['user_email'];
-  $stmt = $conn->prepare("UPDATE users SET bio = ? WHERE email = ?");
-  $stmt->bind_param("ss", $new_bio, $user_email);
+  $stmt = $conn->prepare("UPDATE users SET bio = ?, name = ?, profile_picture = ? WHERE email = ?");
+  $stmt->bind_param("ssss", $new_bio, $new_name, $new_avatar, $user_email);
   $stmt->execute();
   $stmt->close();
 }
@@ -41,6 +43,8 @@ $stmt->execute();
 $user_result = $stmt->get_result();
 $user = $user_result->fetch_assoc();
 $stmt->close();
+// Set profile picture (default if not set)
+$profile_picture = isset($user['profile_picture']) && $user['profile_picture'] ? $user['profile_picture'] : '../Pictures/Placeholder2.png';
 
 // Fetch user's bookings (most recent first), grouped by booking action (all seats booked together)
 $bookings = [];
@@ -51,12 +55,14 @@ $stmt = $conn->prepare("SELECT
     b.show_date, 
     b.show_time, 
     b.created_at, 
+    m.price AS movie_price, /* fetch price */
+    b.movie_id, /* fetch movie_id for price lookup */
     GROUP_CONCAT(b.seat ORDER BY b.seat) AS seats
 FROM booking b
 LEFT JOIN movies m ON b.movie_id = m.movie_id
 LEFT JOIN cinemas c ON b.cinema_id = c.cinema_id
 WHERE b.user_email = ?
-GROUP BY m.title, c.name, b.show_date, b.show_time, b.created_at
+GROUP BY m.title, c.name, b.show_date, b.show_time, b.created_at, m.price, b.movie_id
 ORDER BY b.created_at DESC, booking_id DESC");
 $stmt->bind_param("s", $user_email);
 $stmt->execute();
@@ -64,6 +70,8 @@ $result = $stmt->get_result();
 $grouped_bookings = [];
 while ($row = $result->fetch_assoc()) {
     $row['seats'] = explode(',', $row['seats']);
+    $row['seat_count'] = count($row['seats']);
+    $row['total_price'] = $row['movie_price'] * $row['seat_count'];
     $grouped_bookings[] = $row;
 }
 $stmt->close();
@@ -120,26 +128,45 @@ $stmt->close();
     <section class="profile-section">
       <div class="profile-header">
         <div class="profile-avatar">
-          <img src="../Pictures/Placeholder2.png" alt="Profile Picture" class="profile-picture-img" />
+          <img src="<?php echo htmlspecialchars($profile_picture); ?>" alt="Profile Picture" class="profile-picture-img" />
         </div>
         <div class="profile-info">
           <div class="profile-top">
             <span class="profile-name">
-              <?php echo htmlspecialchars($user['email']); ?>
+              <?php echo htmlspecialchars($user['name'] ? $user['name'] : $user['email']); ?>
             </span>
             <button class="edit-profile-btn" id="edit-profile-btn" type="button">EDIT PROFILE</button>
           </div>
           <div class="profile-tags">
-           
+            
           </div>
           <!-- Bio Section -->
           <div id="bio-section">
             <div id="bio-display" class="bio-display">
-              <strong>Bio:</strong>
-              <span id="bio-text"><?php echo htmlspecialchars($user['bio'] ?? ''); ?></span>
+              <strong>Bio:</strong> <span id="bio-text"><?php echo htmlspecialchars($user['bio'] ?? ''); ?></span>
             </div>
             <form id="edit-bio-form" class="edit-bio-form" method="post" style="display:none;">
-              <textarea name="bio" rows="3" required><?php echo htmlspecialchars($user['bio'] ?? ''); ?></textarea><br>
+              <label for="edit-name"><strong>Name:</strong></label><br>
+              <input type="text" id="edit-name" name="name" value="<?php echo htmlspecialchars($user['name'] ?? ''); ?>" placeholder="<?php echo htmlspecialchars($user['email']); ?>" required style="width:100%;max-width:400px;"><br>
+              <label for="edit-bio"><strong>Bio:</strong></label><br>
+              <textarea id="edit-bio" name="bio" rows="3" required><?php echo htmlspecialchars($user['bio'] ?? ''); ?></textarea><br>
+              <label><strong>Profile Picture:</strong></label><br>
+              <div class="avatar-selection" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+                <?php
+                  $avatar_dir = __DIR__ . '/../Avatar/';
+                  $avatar_files = array_values(array_filter(scandir($avatar_dir), function($f) use ($avatar_dir) {
+                    return preg_match('/\.(png|jpg|jpeg)$/i', $f) && is_file($avatar_dir . $f);
+                  }));
+                  foreach ($avatar_files as $avatar) {
+                    $avatar_path = '../Avatar/' . $avatar;
+                    $checked = ($profile_picture === $avatar_path) ? 'checked' : '';
+                    echo '<label style="display:inline-block;text-align:center;cursor:pointer;">';
+                    echo '<input type="radio" name="profile_picture" value="' . htmlspecialchars($avatar_path) . '" style="display:block;margin:auto;" ' . $checked . '>';
+                    echo '<img src="' . htmlspecialchars($avatar_path) . '" alt="avatar" style="width:48px;height:48px;border-radius:50%;border:2px solid #ccc;margin:4px 0;">';
+                    echo '</label>';
+                  }
+                ?>
+              </div>
               <button type="submit" name="save_bio">Save</button>
               <button type="button" id="cancel-edit-bio">Cancel</button>
             </form>
@@ -178,6 +205,21 @@ $stmt->close();
                 <div class="transaction-details">
                   <span>Seats: <strong><?php echo htmlspecialchars(implode(', ', $booking['seats'])); ?></strong></span>
                   <span>Time: <strong><?php echo htmlspecialchars(date('g:i A', strtotime($booking['show_time']))); ?></strong></span>
+                  <span>Booking IDs: <strong>
+                    <?php
+                      // Fetch all booking_ids for this booking group (same movie, cinema, showtime, created_at)
+                      $ids_stmt = $conn->prepare("SELECT booking_id FROM booking WHERE user_email = ? AND movie_id = ? AND cinema_id = (SELECT cinema_id FROM cinemas WHERE name = ?) AND show_date = ? AND show_time = ? AND created_at = (SELECT created_at FROM booking WHERE booking_id = ? LIMIT 1) ORDER BY seat");
+                      $ids_stmt->bind_param("sisssi", $user_email, $booking['movie_id'], $booking['cinema_name'], $booking['show_date'], $booking['show_time'], $booking['booking_id']);
+                      $ids_stmt->execute();
+                      $ids_result = $ids_stmt->get_result();
+                      $ids = [];
+                      while ($id_row = $ids_result->fetch_assoc()) { $ids[] = $id_row['booking_id']; }
+                      $ids_stmt->close();
+                      echo htmlspecialchars(implode(', ', $ids));
+                    ?>
+                  </strong></span>
+                  <span>Price per seat: <strong>₱<?php echo number_format($booking['movie_price'], 2); ?></strong></span>
+                  <span>Total price: <strong>₱<?php echo number_format($booking['total_price'], 2); ?></strong></span>
                   <!-- View Details Button -->
                   <button type="button" class="view-details-btn" 
                     data-movie-title="<?php echo htmlspecialchars($booking['movie_title']); ?>"
@@ -186,6 +228,9 @@ $stmt->close();
                     data-show-date="<?php echo htmlspecialchars($booking['show_date']); ?>"
                     data-show-time="<?php echo htmlspecialchars(date('g:i A', strtotime($booking['show_time']))); ?>"
                     data-booking-id="<?php echo htmlspecialchars($booking['booking_id']); ?>"
+                    data-booking-ids="<?php echo htmlspecialchars(implode(', ', $ids)); ?>"
+                    data-movie-price="<?php echo number_format($booking['movie_price'], 2); ?>"
+                    data-total-price="<?php echo number_format($booking['total_price'], 2); ?>"
                     >View Details</button>
                   <!-- Delete Booking Button (delete all seats in this booking action) -->
                   <form method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this booking?');">
@@ -272,7 +317,9 @@ $stmt->close();
             <div><strong>Seats:</strong> ${btn.getAttribute('data-seats')}</div>
             <div><strong>Date:</strong> ${btn.getAttribute('data-show-date')}</div>
             <div><strong>Time:</strong> ${btn.getAttribute('data-show-time')}</div>
-            <div><strong>Booking ID:</strong> ${btn.getAttribute('data-booking-id')}</div>
+            <div><strong>Booking IDs:</strong> ${btn.getAttribute('data-booking-ids')}</div>
+            <div><strong>Price per seat:</strong> ₱${btn.getAttribute('data-movie-price')}</div>
+            <div><strong>Total price:</strong> ₱${btn.getAttribute('data-total-price')}</div>
           `;
           modal.style.display = 'block';
         });

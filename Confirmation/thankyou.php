@@ -3,6 +3,16 @@
 
 include(__DIR__ . "/../db.php");
 session_start();
+$profile_picture = '../Avatar/Placeholder2.png';
+if (isset($_SESSION['user_email'])) {
+  $user_email = $_SESSION['user_email'];
+  $stmt = $conn->prepare("SELECT profile_picture FROM users WHERE email = ?");
+  $stmt->bind_param("s", $user_email);
+  $stmt->execute();
+  $stmt->bind_result($pic);
+  if ($stmt->fetch() && $pic) $profile_picture = $pic;
+  $stmt->close();
+}
 
 if (!isset($_SESSION['user_email'])) {
   header("Location: ../login.php");
@@ -60,12 +70,16 @@ $seats = isset($_POST['seat']) ? (array)$_POST['seat'] : [];
 
 // Fetch movie and cinema names for display
 $movie_title = '';
+$movie_price = 0;
 if ($movie_id) {
-  $stmt = $conn->prepare("SELECT title FROM movies WHERE movie_id = ?");
+  $stmt = $conn->prepare("SELECT title, price FROM movies WHERE movie_id = ?");
   $stmt->bind_param("i", $movie_id);
   $stmt->execute();
   $result = $stmt->get_result();
-  if ($row = $result->fetch_assoc()) $movie_title = $row['title'];
+  if ($row = $result->fetch_assoc()) {
+    $movie_title = $row['title'];
+    $movie_price = $row['price'];
+  }
   $stmt->close();
 }
 $cinema_name = '';
@@ -77,6 +91,17 @@ if ($cinema_id) {
   if ($row = $result->fetch_assoc()) $cinema_name = $row['name'];
   $stmt->close();
 }
+
+// Fetch user's name for display (show name if set, else email)
+$user_display_name = $user_email;
+$stmt = $conn->prepare("SELECT name FROM users WHERE email = ?");
+$stmt->bind_param("s", $user_email);
+$stmt->execute();
+$stmt->bind_result($fetched_name);
+if ($stmt->fetch() && !empty($fetched_name)) {
+  $user_display_name = $fetched_name;
+}
+$stmt->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -111,7 +136,7 @@ if ($cinema_id) {
 
     <div class="header-profile">
       <a href="../ProfilePage/ProfilePage.php" class="header-profile-link-rect" aria-label="Go to Profile Page">
-        <img src="../Pictures/Placeholder2.png" alt="User Profile" class="header-pfp">
+        <img src="<?php echo htmlspecialchars($profile_picture); ?>" alt="User Profile" class="header-pfp">
         <span class="header-profile-text">Profile</span>
       </a>
     </div>
@@ -123,7 +148,7 @@ if ($cinema_id) {
 
   <main>
     <section class="thankyou-container">
-  <h1>Thank you, <?php echo htmlspecialchars($user_email); ?>!</h1>
+  <h1>Thank you, <?php echo htmlspecialchars($user_display_name); ?>!</h1>
   <div class="ticket-details">
     <div class="detail-row">
       <span class="label">Cinema:</span>
@@ -143,6 +168,14 @@ if ($cinema_id) {
         <?php echo htmlspecialchars(date('M d, Y', strtotime($show_date))); ?>
         <?php echo htmlspecialchars(date('g:i A', strtotime($show_time))); ?>
       </b></u></span>
+    </div>
+    <div class="detail-row">
+      <span class="label">Price per seat:</span>
+      <span class="value"><u><b>₱<?php echo number_format($movie_price, 2); ?></b></u></span>
+    </div>
+    <div class="detail-row">
+      <span class="label">Total price:</span>
+      <span class="value"><u><b>₱<?php echo number_format($movie_price * count($seats), 2); ?></b></u></span>
     </div>
   </div>
   <form method="post" style="margin-top:24px;">
