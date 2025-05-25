@@ -38,10 +38,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
     echo "<p style='text-align:center;'><a href='../SeatSelection/SeatSelection.php?movie_id=$movie_id&cinema_id=$cinema_id&screen_id=$screen_id&show_date=$show_date&show_time=$show_time'>Go back to seat selection</a></p>";
     exit;
   }
-  // Insert all seats
+  // Insert all seats with the same created_at timestamp
+  $created_at = date('Y-m-d H:i:s');
   foreach ($seats as $seat) {
-    $stmt = $conn->prepare("INSERT INTO booking (user_email, movie_id, cinema_id, screen_id, show_date, show_time, seat) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("siiisss", $user_email, $movie_id, $cinema_id, $screen_id, $show_date, $show_time, $seat);
+    $stmt = $conn->prepare("INSERT INTO booking (user_email, movie_id, cinema_id, screen_id, show_date, show_time, seat, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("siiissss", $user_email, $movie_id, $cinema_id, $screen_id, $show_date, $show_time, $seat, $created_at);
     $stmt->execute();
     $stmt->close();
   }

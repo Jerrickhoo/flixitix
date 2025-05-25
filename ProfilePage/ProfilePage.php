@@ -42,14 +42,22 @@ $user_result = $stmt->get_result();
 $user = $user_result->fetch_assoc();
 $stmt->close();
 
-// Fetch user's bookings (most recent first), grouped by booking_id (booking action)
+// Fetch user's bookings (most recent first), grouped by booking action (all seats booked together)
 $bookings = [];
-$stmt = $conn->prepare("SELECT b.booking_id, m.title AS movie_title, b.show_date, b.show_time, b.created_at, GROUP_CONCAT(b.seat ORDER BY b.seat) AS seats
+$stmt = $conn->prepare("SELECT 
+    MIN(b.booking_id) AS booking_id, 
+    m.title AS movie_title, 
+    c.name AS cinema_name,
+    b.show_date, 
+    b.show_time, 
+    b.created_at, 
+    GROUP_CONCAT(b.seat ORDER BY b.seat) AS seats
 FROM booking b
 LEFT JOIN movies m ON b.movie_id = m.movie_id
+LEFT JOIN cinemas c ON b.cinema_id = c.cinema_id
 WHERE b.user_email = ?
-GROUP BY b.booking_id, m.title, b.show_date, b.show_time, b.created_at
-ORDER BY b.created_at DESC, b.booking_id DESC");
+GROUP BY m.title, c.name, b.show_date, b.show_time, b.created_at
+ORDER BY b.created_at DESC, booking_id DESC");
 $stmt->bind_param("s", $user_email);
 $stmt->execute();
 $result = $stmt->get_result();
