@@ -55,12 +55,14 @@ $stmt = $conn->prepare("SELECT
     b.show_date, 
     b.show_time, 
     b.created_at, 
+    m.price AS movie_price, /* fetch price */
+    b.movie_id, /* fetch movie_id for price lookup */
     GROUP_CONCAT(b.seat ORDER BY b.seat) AS seats
 FROM booking b
 LEFT JOIN movies m ON b.movie_id = m.movie_id
 LEFT JOIN cinemas c ON b.cinema_id = c.cinema_id
 WHERE b.user_email = ?
-GROUP BY m.title, c.name, b.show_date, b.show_time, b.created_at
+GROUP BY m.title, c.name, b.show_date, b.show_time, b.created_at, m.price, b.movie_id
 ORDER BY b.created_at DESC, booking_id DESC");
 $stmt->bind_param("s", $user_email);
 $stmt->execute();
@@ -68,6 +70,8 @@ $result = $stmt->get_result();
 $grouped_bookings = [];
 while ($row = $result->fetch_assoc()) {
     $row['seats'] = explode(',', $row['seats']);
+    $row['seat_count'] = count($row['seats']);
+    $row['total_price'] = $row['movie_price'] * $row['seat_count'];
     $grouped_bookings[] = $row;
 }
 $stmt->close();
@@ -201,6 +205,21 @@ $stmt->close();
                 <div class="transaction-details">
                   <span>Seats: <strong><?php echo htmlspecialchars(implode(', ', $booking['seats'])); ?></strong></span>
                   <span>Time: <strong><?php echo htmlspecialchars(date('g:i A', strtotime($booking['show_time']))); ?></strong></span>
+                  <span>Booking IDs: <strong>
+                    <?php
+                      // Fetch all booking_ids for this booking group (same movie, cinema, showtime, created_at)
+                      $ids_stmt = $conn->prepare("SELECT booking_id FROM booking WHERE user_email = ? AND movie_id = ? AND cinema_id = (SELECT cinema_id FROM cinemas WHERE name = ?) AND show_date = ? AND show_time = ? AND created_at = (SELECT created_at FROM booking WHERE booking_id = ? LIMIT 1) ORDER BY seat");
+                      $ids_stmt->bind_param("sisssi", $user_email, $booking['movie_id'], $booking['cinema_name'], $booking['show_date'], $booking['show_time'], $booking['booking_id']);
+                      $ids_stmt->execute();
+                      $ids_result = $ids_stmt->get_result();
+                      $ids = [];
+                      while ($id_row = $ids_result->fetch_assoc()) { $ids[] = $id_row['booking_id']; }
+                      $ids_stmt->close();
+                      echo htmlspecialchars(implode(', ', $ids));
+                    ?>
+                  </strong></span>
+                  <span>Price per seat: <strong>₱<?php echo number_format($booking['movie_price'], 2); ?></strong></span>
+                  <span>Total price: <strong>₱<?php echo number_format($booking['total_price'], 2); ?></strong></span>
                   <!-- View Details Button -->
                   <button type="button" class="view-details-btn" 
                     data-movie-title="<?php echo htmlspecialchars($booking['movie_title']); ?>"
@@ -209,6 +228,9 @@ $stmt->close();
                     data-show-date="<?php echo htmlspecialchars($booking['show_date']); ?>"
                     data-show-time="<?php echo htmlspecialchars(date('g:i A', strtotime($booking['show_time']))); ?>"
                     data-booking-id="<?php echo htmlspecialchars($booking['booking_id']); ?>"
+                    data-booking-ids="<?php echo htmlspecialchars(implode(', ', $ids)); ?>"
+                    data-movie-price="<?php echo number_format($booking['movie_price'], 2); ?>"
+                    data-total-price="<?php echo number_format($booking['total_price'], 2); ?>"
                     >View Details</button>
                   <!-- Delete Booking Button (delete all seats in this booking action) -->
                   <form method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this booking?');">
@@ -295,7 +317,9 @@ $stmt->close();
             <div><strong>Seats:</strong> ${btn.getAttribute('data-seats')}</div>
             <div><strong>Date:</strong> ${btn.getAttribute('data-show-date')}</div>
             <div><strong>Time:</strong> ${btn.getAttribute('data-show-time')}</div>
-            <div><strong>Booking ID:</strong> ${btn.getAttribute('data-booking-id')}</div>
+            <div><strong>Booking IDs:</strong> ${btn.getAttribute('data-booking-ids')}</div>
+            <div><strong>Price per seat:</strong> ₱${btn.getAttribute('data-movie-price')}</div>
+            <div><strong>Total price:</strong> ₱${btn.getAttribute('data-total-price')}</div>
           `;
           modal.style.display = 'block';
         });

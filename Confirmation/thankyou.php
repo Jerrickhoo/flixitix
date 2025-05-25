@@ -70,12 +70,16 @@ $seats = isset($_POST['seat']) ? (array)$_POST['seat'] : [];
 
 // Fetch movie and cinema names for display
 $movie_title = '';
+$movie_price = 0;
 if ($movie_id) {
-  $stmt = $conn->prepare("SELECT title FROM movies WHERE movie_id = ?");
+  $stmt = $conn->prepare("SELECT title, price FROM movies WHERE movie_id = ?");
   $stmt->bind_param("i", $movie_id);
   $stmt->execute();
   $result = $stmt->get_result();
-  if ($row = $result->fetch_assoc()) $movie_title = $row['title'];
+  if ($row = $result->fetch_assoc()) {
+    $movie_title = $row['title'];
+    $movie_price = $row['price'];
+  }
   $stmt->close();
 }
 $cinema_name = '';
@@ -164,6 +168,14 @@ $stmt->close();
         <?php echo htmlspecialchars(date('M d, Y', strtotime($show_date))); ?>
         <?php echo htmlspecialchars(date('g:i A', strtotime($show_time))); ?>
       </b></u></span>
+    </div>
+    <div class="detail-row">
+      <span class="label">Price per seat:</span>
+      <span class="value"><u><b>₱<?php echo number_format($movie_price, 2); ?></b></u></span>
+    </div>
+    <div class="detail-row">
+      <span class="label">Total price:</span>
+      <span class="value"><u><b>₱<?php echo number_format($movie_price * count($seats), 2); ?></b></u></span>
     </div>
   </div>
   <form method="post" style="margin-top:24px;">
