@@ -155,7 +155,7 @@ $stmt->close();
                 <?php
                   $avatar_dir = __DIR__ . '/../Avatar/';
                   $avatar_files = array_values(array_filter(scandir($avatar_dir), function($f) use ($avatar_dir) {
-                    return preg_match('/\.(png|jpg|jpeg)$/i', $f) && is_file($avatar_dir . $f);
+                    return preg_match('/\.(png|jpg|jpeg|gif|webp)$/i', $f) && is_file($avatar_dir . $f);
                   }));
                   foreach ($avatar_files as $avatar) {
                     $avatar_path = '../Avatar/' . $avatar;

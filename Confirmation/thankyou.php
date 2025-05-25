@@ -20,6 +20,17 @@ if (!isset($_SESSION['user_email'])) {
 }
 $user_email = $_SESSION['user_email'];
 
+// Fetch user's name for display (show name if set, else email)
+$user_display_name = $user_email;
+$stmt = $conn->prepare("SELECT name FROM users WHERE email = ?");
+$stmt->bind_param("s", $user_email);
+$stmt->execute();
+$stmt->bind_result($fetched_name);
+if ($stmt->fetch() && !empty($fetched_name)) {
+  $user_display_name = $fetched_name;
+}
+$stmt->close();
+
 // Handle booking confirmation
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
   $movie_id = intval($_POST['movie_id']);
@@ -50,58 +61,74 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm_booking'])) {
   }
   // Insert all seats with the same created_at timestamp
   $created_at = date('Y-m-d H:i:s');
+  $booking_ids = [];
   foreach ($seats as $seat) {
     $stmt = $conn->prepare("INSERT INTO booking (user_email, movie_id, cinema_id, screen_id, show_date, show_time, seat, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("siiissss", $user_email, $movie_id, $cinema_id, $screen_id, $show_date, $show_time, $seat, $created_at);
     $stmt->execute();
+    $booking_ids[] = $stmt->insert_id;
     $stmt->close();
   }
-  header("Location: ../ProfilePage/ProfilePage.php");
-  exit();
-}
-
-// Fetch selections from POST or previous POST
-$movie_id = isset($_POST['movie_id']) ? intval($_POST['movie_id']) : 0;
-$cinema_id = isset($_POST['cinema_id']) ? intval($_POST['cinema_id']) : 0;
-$screen_id = isset($_POST['screen_id']) ? intval($_POST['screen_id']) : 0;
-$show_date = isset($_POST['show_date']) ? $_POST['show_date'] : '';
-$show_time = isset($_POST['show_time']) ? $_POST['show_time'] : '';
-$seats = isset($_POST['seat']) ? (array)$_POST['seat'] : [];
-
-// Fetch movie and cinema names for display
-$movie_title = '';
-$movie_price = 0;
-if ($movie_id) {
+  // Fetch movie and cinema details for session
   $stmt = $conn->prepare("SELECT title, price FROM movies WHERE movie_id = ?");
   $stmt->bind_param("i", $movie_id);
   $stmt->execute();
   $result = $stmt->get_result();
+  $movie_title = '';
+  $movie_price = 0;
   if ($row = $result->fetch_assoc()) {
     $movie_title = $row['title'];
     $movie_price = $row['price'];
   }
   $stmt->close();
-}
-$cinema_name = '';
-if ($cinema_id) {
   $stmt = $conn->prepare("SELECT name FROM cinemas WHERE cinema_id = ?");
   $stmt->bind_param("i", $cinema_id);
   $stmt->execute();
   $result = $stmt->get_result();
+  $cinema_name = '';
   if ($row = $result->fetch_assoc()) $cinema_name = $row['name'];
   $stmt->close();
+  // Store ticket details in session
+  $_SESSION['ticket_details'] = [
+    'movie_id' => $movie_id,
+    'cinema_id' => $cinema_id,
+    'screen_id' => $screen_id,
+    'show_date' => $show_date,
+    'show_time' => $show_time,
+    'seats' => $seats,
+    'movie_title' => $movie_title,
+    'movie_price' => $movie_price,
+    'cinema_name' => $cinema_name,
+    'booking_ids' => $booking_ids
+  ];
+  header("Location: thankyou.php");
+  exit();
 }
 
-// Fetch user's name for display (show name if set, else email)
-$user_display_name = $user_email;
-$stmt = $conn->prepare("SELECT name FROM users WHERE email = ?");
-$stmt->bind_param("s", $user_email);
-$stmt->execute();
-$stmt->bind_result($fetched_name);
-if ($stmt->fetch() && !empty($fetched_name)) {
-  $user_display_name = $fetched_name;
+// On GET, fetch ticket details from session
+$ticket_details = isset($_SESSION['ticket_details']) ? $_SESSION['ticket_details'] : null;
+$show_confirm_form = false;
+if ($ticket_details) {
+  $movie_id = $ticket_details['movie_id'];
+  $cinema_id = $ticket_details['cinema_id'];
+  $screen_id = $ticket_details['screen_id'];
+  $show_date = $ticket_details['show_date'];
+  $show_time = $ticket_details['show_time'];
+  $seats = $ticket_details['seats'];
+  $movie_title = $ticket_details['movie_title'];
+  $movie_price = $ticket_details['movie_price'];
+  $cinema_name = $ticket_details['cinema_name'];
+  $booking_ids = $ticket_details['booking_ids'];
+  // Clear after displaying to prevent re-showing on refresh
+  unset($_SESSION['ticket_details']);
+  $show_confirm_form = false;
+} else {
+  // If not coming from a booking, show confirm form (legacy/manual access)
+  $show_confirm_form = true;
+  // No ticket details, redirect to movie menu
+  header("Location: ../MovieMenu/Moviemenu.php");
+  exit();
 }
-$stmt->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -178,6 +205,7 @@ $stmt->close();
       <span class="value"><u><b>₱<?php echo number_format($movie_price * count($seats), 2); ?></b></u></span>
     </div>
   </div>
+  <?php if ($show_confirm_form): ?>
   <form method="post" style="margin-top:24px;">
     <input type="hidden" name="confirm_booking" value="1">
     <input type="hidden" name="movie_id" value="<?php echo htmlspecialchars($movie_id); ?>">
@@ -190,6 +218,11 @@ $stmt->close();
     <?php endforeach; ?>
     <button class="confirm-btn" type="submit">CONFIRM</button>
   </form>
+  <?php else: ?>
+  <div style="margin-top:24px; text-align:center;">
+    <a href="../ProfilePage/ProfilePage.php" class="confirm-btn">Go to My Profile</a>
+  </div>
+  <?php endif; ?>
 </section>
   </main>
   <footer>
