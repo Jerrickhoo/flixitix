@@ -43,6 +43,7 @@ if ($movie_id && $cinema_id && $screen_id && $show_date && $show_time) {
   <input type="hidden" name="screen_id" value="<?php echo $screen_id; ?>">
   <input type="hidden" name="show_date" value="<?php echo htmlspecialchars($show_date); ?>">
   <input type="hidden" name="show_time" value="<?php echo htmlspecialchars($show_time); ?>">
+  <input type="hidden" name="confirm_booking" value="1">
   <div id="selected-seats-container"></div>
 </form>
   <!-- Progress Bar Header (Seat Selection step active) -->

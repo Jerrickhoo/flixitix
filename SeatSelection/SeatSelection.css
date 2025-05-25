@@ -29,6 +29,12 @@ body {
   align-items: center;
   gap: 8px;
 }
+.seat-legend-item.unavailable {
+  color: #e74c3c;
+}
+.seat-legend-item.available {
+  color: #27ae60;
+}
 .seat-box {
   display: inline-flex;
   align-items: center;
@@ -40,17 +46,16 @@ body {
   font-size: 1.2rem;
   font-weight: bold;
   margin-right: 6px;
-  background: #fff;
 }
 .seat-legend-item.unavailable .seat-box {
-  border-color: #e74c3c;
-  color: #e74c3c;
-  background: #222;
+  background: #e74c3c;
+  border-color: #c0392b;
+  color: #fff;
 }
 .seat-legend-item.available .seat-box {
-  border-color: #27ae60;
-  color: #27ae60;
-  background: #222;
+  border-color: #ffffff;
+  color: #ffffff;
+
 }
 .seat-screen {
   width: 80%;

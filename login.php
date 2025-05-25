@@ -71,7 +71,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Flixtix</title>
     <style>
-        /* ...your existing CSS here... */
         * {
             margin: 0;
             padding: 0;
@@ -121,6 +120,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             background: linear-gradient(rgba(255, 0, 0, 0.55), rgba(26, 26, 26, 1));
             z-index: -1;
         }
+        .background-logo {
+            position: fixed;
+            top: 55%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            opacity: 0.8;
+            background: url('Pictures/Logo.png') no-repeat center center;
+            background-size: contain;
+            z-index: -1;
+            filter: brightness(150%);
+            pointer-events: none;
+        }
         .login-box,
         .signup-form {
             position: absolute;
@@ -128,13 +141,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: #222222;
+            background: rgba(34, 34, 34, 0.85);
+            backdrop-filter: blur(4px);
             padding: 40px;
             border-radius: 8px;
             color: white;
             opacity: 0;
             pointer-events: none;
             transition: transform 0.5s ease, opacity 0.5s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         .login-box.active,
         .signup-form.active {
@@ -284,6 +299,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         <img src="background/thunderbolts_ver10.jpg" alt="Poster 25">
     </div>
     <div class="overlay"></div>
+    <div class="background-logo"></div>
 
     <div class="login-box">
         <h2>Sign In</h2>

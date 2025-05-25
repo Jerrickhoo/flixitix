@@ -39,10 +39,22 @@ const nowShowingPosterImages = [
 ];
 
 const comingSoonPosterImages = [
-  '../movie posters/494363868_1104345425049143_2965171941539806633_n (1).jpg',
-  '../movie posters/494362647_1108904717928215_3303085138659229688_n.jpg',
-  '../movie posters/494359045_714007104422193_5897134606201055671_n.jpg',
-  '../movie posters/494356759_682346394536032_9180329636116980223_n.png'
+  '../background/carryon.jpg',
+  '../background/conclave.jpg',
+  '../background/conjuring_last_rites.jpg',
+  '../background/despicable_me_four.jpg',
+  '../background/didi.jpg',
+  '../background/fear_street_prom_queen_ver7.jpg',
+  '../background/final_destination_bloodlines_ver8.jpg',
+  '../background/first_omen.jpg',
+  '../background/ghostbusters_afterlife_two_ver7.jpg',
+  '../background/gladiator_ii.jpg',
+  '../background/longlegs.jpg',
+  '../background/maxxxine_ver2.jpg',
+  '../background/minecraft_the_movie_ver3.jpg',
+  '../background/nobody_two_ver2.jpg',
+  '../background/smurfs_ver3.jpg',
+  '../background/thunderbolts_ver10.jpg'
 ];
 
 // Utility to get a random non-repeating subset of images
