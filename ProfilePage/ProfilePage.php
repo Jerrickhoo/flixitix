@@ -150,8 +150,7 @@ $stmt->close();
               <input type="text" id="edit-name" name="name" value="<?php echo htmlspecialchars($user['name'] ?? ''); ?>" placeholder="<?php echo htmlspecialchars($user['email']); ?>" required style="width:100%;max-width:400px;"><br>
               <label for="edit-bio"><strong>Bio:</strong></label><br>
               <textarea id="edit-bio" name="bio" rows="3" required><?php echo htmlspecialchars($user['bio'] ?? ''); ?></textarea><br>
-              <label><strong>Profile Picture:</strong></label><br>
-              <div class="avatar-selection" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px;">
+              <label><strong>Profile Picture:</strong></label><br>              <div class="avatar-selection">
                 <?php
                   $avatar_dir = __DIR__ . '/../Avatar/';
                   $avatar_files = array_values(array_filter(scandir($avatar_dir), function($f) use ($avatar_dir) {
@@ -160,9 +159,9 @@ $stmt->close();
                   foreach ($avatar_files as $avatar) {
                     $avatar_path = '../Avatar/' . $avatar;
                     $checked = ($profile_picture === $avatar_path) ? 'checked' : '';
-                    echo '<label style="display:inline-block;text-align:center;cursor:pointer;">';
-                    echo '<input type="radio" name="profile_picture" value="' . htmlspecialchars($avatar_path) . '" style="display:block;margin:auto;" ' . $checked . '>';
-                    echo '<img src="' . htmlspecialchars($avatar_path) . '" alt="avatar" style="width:48px;height:48px;border-radius:50%;border:2px solid #ccc;margin:4px 0;">';
+                    echo '<label>';
+                    echo '<input type="radio" name="profile_picture" value="' . htmlspecialchars($avatar_path) . '" ' . $checked . '>';
+                    echo '<img src="' . htmlspecialchars($avatar_path) . '" alt="avatar">';
                     echo '</label>';
                   }
                 ?>

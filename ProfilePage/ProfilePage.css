@@ -1102,3 +1102,46 @@ footer {
   max-width: 100vw !important;
   overflow-x: hidden !important;
 }
+
+.avatar-selection {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  justify-content: flex-start;
+  max-width: 600px;
+}
+
+.avatar-selection label {
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+}
+
+.avatar-selection input[type="radio"] {
+  display: none;
+}
+
+.avatar-selection img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid #333;
+  margin: 4px 0;
+  transition: all 0.2s ease;
+}
+
+.avatar-selection input[type="radio"]:checked + img {
+  border-color: #e50914;
+  transform: scale(1.1);
+  box-shadow: 
+    0 0 0 3px rgba(229, 9, 20, 0.3),
+    0 4px 16px rgba(229, 9, 20, 0.2);
+}
+
+.avatar-selection label:hover img {
+  border-color: #444;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}

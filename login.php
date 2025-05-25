@@ -122,15 +122,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         }
         .background-logo {
             position: fixed;
-            top: 55%;
+            top: 20%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 800px;
             height: 800px;
             opacity: 0.8;
-            background: url('Pictures/Logo.png') no-repeat center center;
+            background: url('Pictures/LoginLogo.png') no-repeat center center;
             background-size: contain;
-            z-index: -1;
+            z-index: 10;
             filter: brightness(150%);
             pointer-events: none;
         }
