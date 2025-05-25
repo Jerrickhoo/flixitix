@@ -202,6 +202,13 @@
   display: block;
   border-radius: 14px;
 }
+
+#progress-movies{
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2.5px;
+}
+
 @media (max-width: 1200px) {
   .movie-menu-grid {
     grid-template-columns: repeat(3, 220px);

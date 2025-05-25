@@ -13,19 +13,21 @@ include(__DIR__ . "/../db.php");
 <body>
 <!-- Progress Bar (replaces header) -->
 <div class="custom-progress-bar dark">
-  <img src="../Pictures/Logo.png" alt="Logo" class="progress-logo">
+  <a href="../Homepage/Homepage.php">
+    <img src="../Pictures/Logo.png" alt="Logo" class="progress-logo">
+  </a>
   <div class="progress-steps">
-    <span class="progress-step active">Main Menu</span>
+    <span class="progress-step active" id="progress-main-menu">Main Menu</span>
     <span class="progress-arrow">&#8594;</span>
-    <span class="progress-step">Movies</span>
+    <span class="progress-step" id="progress-movies">Movies</span>
     <span class="progress-arrow">&#8594;</span>
-    <span class="progress-step">Cinema</span>
+    <span class="progress-step" id="progress-cinema">Cinema</span>
     <span class="progress-arrow">&#8594;</span>
-    <span class="progress-step">Get Ticket</span>
+    <span class="progress-step" id="progress-get-ticket">Get Ticket</span>
     <span class="progress-arrow">&#8594;</span>
-    <span class="progress-step">Seat Selection</span>
+    <span class="progress-step" id="progress-seat-selection">Seat Selection</span>
     <span class="progress-arrow">&#8594;</span>
-    <span class="progress-step">Confirmation</span>
+    <span class="progress-step" id="progress-confirmation">Confirmation</span>
   </div>
   <div class="header-profile">
     <a href="../ProfilePage/ProfilePage.php" class="header-profile-link-rect" aria-label="Go to Profile Page">

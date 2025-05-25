@@ -91,7 +91,7 @@ if ($movie_id && $cinema_id && $screen_id) {
       <span class="progress-arrow active">&#8594;</span>
       <span class="progress-step active">Cinema</span>
       <span class="progress-arrow active">&#8594;</span>
-      <span class="progress-step active">Get Ticket</span>
+      <span class="progress-step active" id="progress-get-ticket">Get Ticket</span>
       <span class="progress-arrow">&#8594;</span>
       <span class="progress-step">Seat Selection</span>
       <span class="progress-arrow">&#8594;</span>

@@ -293,4 +293,10 @@ footer {
     font-size: 1rem;
   }
 }
-/* ...existing code... */
+
+#progress-get-ticket{
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2.5px;
+
+}

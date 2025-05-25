@@ -228,6 +228,12 @@ footer {
   color: #e50914;
   font-weight: bold;
 }
+
+#progress-main-menu{
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 2.5px;
+}
 .custom-progress-bar .progress-arrow {
   color: #bbb;
   font-size: 1.3rem;

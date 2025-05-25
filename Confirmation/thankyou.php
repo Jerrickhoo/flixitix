@@ -104,7 +104,7 @@ if ($cinema_id) {
       <span class="progress-arrow active">&#8594;</span>
       <span class="progress-step active">Seat Selection</span>
       <span class="progress-arrow active">&#8594;</span>
-      <span class="progress-step active">Confirmation</span>
+      <span class="progress-step active" id="progress-confirmation">Confirmation</span>
     </div>
 
 

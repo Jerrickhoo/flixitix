@@ -57,17 +57,18 @@ while ($row = $cinema_result->fetch_assoc()) {
   </a>
   
     <div class="progress-steps">
-      <span class="progress-step active">Main Menu</span>
-      <span class="progress-arrow active">&#8594;</span>
-      <span class="progress-step active">Movies</span>
-      <span class="progress-arrow active">&#8594;</span>
-      <span class="progress-step active">Cinema</span>
-      <span class="progress-arrow">&#8594;</span>
-      <span class="progress-step">Get Ticket</span>
-      <span class="progress-arrow">&#8594;</span>
-      <span class="progress-step">Seat Selection</span>
-      <span class="progress-arrow">&#8594;</span>
-      <span class="progress-step">Confirmation</span>
+
+       <span class="progress-step active">Main Menu</span>
+       <span class="progress-arrow active">&#8594;</span>
+       <span class="progress-step active">Movies</span>
+       <span class="progress-arrow active">&#8594;</span>
+       <span class="progress-step active" id="progress-cinema">Cinema</span>
+       <span class="progress-arrow">&#8594;</span>
+       <span class="progress-step" >Get Ticket</span>
+       <span class="progress-arrow">&#8594;</span>
+       <span class="progress-step" >Seat Selection</span>
+       <span class="progress-arrow">&#8594;</span>
+       <span class="progress-step" >Confirmation</span>
     </div>
     <div class="header-profile">
       <a href="../ProfilePage/ProfilePage.php" class="header-profile-link-rect" aria-label="Go to Profile Page">

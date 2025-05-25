@@ -57,9 +57,9 @@ if ($movie_id && $cinema_id && $screen_id && $show_date && $show_time) {
       <span class="progress-arrow active">&#8594;</span>
       <span class="progress-step active">Cinema</span>
       <span class="progress-arrow active">&#8594;</span>
-      <span class="progress-step active">get Ticket</span>
+      <span class="progress-step active">Get Ticket</span>
       <span class="progress-arrow active">&#8594;</span>
-      <span class="progress-step active">Seat Selection</span>
+      <span class="progress-step active" id="progress-seat-selection">Seat Selection</span>
       <span class="progress-arrow">&#8594;</span>
       <span class="progress-step">Confirmation</span>
     </div>
