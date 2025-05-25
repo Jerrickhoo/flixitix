@@ -11,12 +11,13 @@ if (!isset($_SESSION['user_email'])) {
   exit();
 }
 
-// Handle bio update
+// Handle bio and name update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_bio'])) {
   $new_bio = trim($_POST['bio']);
+  $new_name = trim($_POST['name']);
   $user_email = $_SESSION['user_email'];
-  $stmt = $conn->prepare("UPDATE users SET bio = ? WHERE email = ?");
-  $stmt->bind_param("ss", $new_bio, $user_email);
+  $stmt = $conn->prepare("UPDATE users SET bio = ?, name = ? WHERE email = ?");
+  $stmt->bind_param("sss", $new_bio, $new_name, $user_email);
   $stmt->execute();
   $stmt->close();
 }
@@ -125,21 +126,23 @@ $stmt->close();
         <div class="profile-info">
           <div class="profile-top">
             <span class="profile-name">
-              <?php echo htmlspecialchars($user['email']); ?>
+              <?php echo htmlspecialchars($user['name'] ? $user['name'] : $user['email']); ?>
             </span>
             <button class="edit-profile-btn" id="edit-profile-btn" type="button">EDIT PROFILE</button>
           </div>
           <div class="profile-tags">
-           
+            
           </div>
           <!-- Bio Section -->
           <div id="bio-section">
             <div id="bio-display" class="bio-display">
-              <strong>Bio:</strong>
-              <span id="bio-text"><?php echo htmlspecialchars($user['bio'] ?? ''); ?></span>
+              <strong>Bio:</strong> <span id="bio-text"><?php echo htmlspecialchars($user['bio'] ?? ''); ?></span>
             </div>
             <form id="edit-bio-form" class="edit-bio-form" method="post" style="display:none;">
-              <textarea name="bio" rows="3" required><?php echo htmlspecialchars($user['bio'] ?? ''); ?></textarea><br>
+              <label for="edit-name"><strong>Name:</strong></label><br>
+              <input type="text" id="edit-name" name="name" value="<?php echo htmlspecialchars($user['name'] ?? ''); ?>" placeholder="<?php echo htmlspecialchars($user['email']); ?>" required style="width:100%;max-width:400px;"><br>
+              <label for="edit-bio"><strong>Bio:</strong></label><br>
+              <textarea id="edit-bio" name="bio" rows="3" required><?php echo htmlspecialchars($user['bio'] ?? ''); ?></textarea><br>
               <button type="submit" name="save_bio">Save</button>
               <button type="button" id="cancel-edit-bio">Cancel</button>
             </form>

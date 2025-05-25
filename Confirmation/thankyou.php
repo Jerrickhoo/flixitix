@@ -77,6 +77,17 @@ if ($cinema_id) {
   if ($row = $result->fetch_assoc()) $cinema_name = $row['name'];
   $stmt->close();
 }
+
+// Fetch user's name for display (show name if set, else email)
+$user_display_name = $user_email;
+$stmt = $conn->prepare("SELECT name FROM users WHERE email = ?");
+$stmt->bind_param("s", $user_email);
+$stmt->execute();
+$stmt->bind_result($fetched_name);
+if ($stmt->fetch() && !empty($fetched_name)) {
+  $user_display_name = $fetched_name;
+}
+$stmt->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -123,7 +134,7 @@ if ($cinema_id) {
 
   <main>
     <section class="thankyou-container">
-  <h1>Thank you, <?php echo htmlspecialchars($user_email); ?>!</h1>
+  <h1>Thank you, <?php echo htmlspecialchars($user_display_name); ?>!</h1>
   <div class="ticket-details">
     <div class="detail-row">
       <span class="label">Cinema:</span>
