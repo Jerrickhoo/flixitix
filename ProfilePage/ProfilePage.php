@@ -178,6 +178,15 @@ $stmt->close();
                 <div class="transaction-details">
                   <span>Seats: <strong><?php echo htmlspecialchars(implode(', ', $booking['seats'])); ?></strong></span>
                   <span>Time: <strong><?php echo htmlspecialchars(date('g:i A', strtotime($booking['show_time']))); ?></strong></span>
+                  <!-- View Details Button -->
+                  <button type="button" class="view-details-btn" 
+                    data-movie-title="<?php echo htmlspecialchars($booking['movie_title']); ?>"
+                    data-cinema-name="<?php echo htmlspecialchars($booking['cinema_name']); ?>"
+                    data-seats="<?php echo htmlspecialchars(implode(', ', $booking['seats'])); ?>"
+                    data-show-date="<?php echo htmlspecialchars($booking['show_date']); ?>"
+                    data-show-time="<?php echo htmlspecialchars(date('g:i A', strtotime($booking['show_time']))); ?>"
+                    data-booking-id="<?php echo htmlspecialchars($booking['booking_id']); ?>"
+                    >View Details</button>
                   <!-- Delete Booking Button (delete all seats in this booking action) -->
                   <form method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this booking?');">
                     <input type="hidden" name="booking_id" value="<?php echo htmlspecialchars($booking['booking_id']); ?>">
@@ -247,6 +256,36 @@ $stmt->close();
           editForm.style.display = 'none';
           bioDisplay.style.display = 'block';
         });
+      }
+    });
+    // Modal logic for transaction details
+    document.addEventListener('DOMContentLoaded', function() {
+      const modal = document.getElementById('transaction-modal');
+      const modalClose = document.getElementById('transaction-modal-close');
+      const modalMovieTitle = document.getElementById('modal-movie-title');
+      const modalTransactionList = document.getElementById('modal-transaction-list');
+      document.querySelectorAll('.view-details-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          modalMovieTitle.textContent = btn.getAttribute('data-movie-title');
+          modalTransactionList.innerHTML = `
+            <div><strong>Cinema:</strong> ${btn.getAttribute('data-cinema-name')}</div>
+            <div><strong>Seats:</strong> ${btn.getAttribute('data-seats')}</div>
+            <div><strong>Date:</strong> ${btn.getAttribute('data-show-date')}</div>
+            <div><strong>Time:</strong> ${btn.getAttribute('data-show-time')}</div>
+            <div><strong>Booking ID:</strong> ${btn.getAttribute('data-booking-id')}</div>
+          `;
+          modal.style.display = 'block';
+        });
+      });
+      if(modalClose) {
+        modalClose.addEventListener('click', function() {
+          modal.style.display = 'none';
+        });
+      }
+      window.onclick = function(event) {
+        if (event.target == modal) {
+          modal.style.display = 'none';
+        }
       }
     });
   </script>
