@@ -94,7 +94,7 @@ while ($row = $cinema_result->fetch_assoc()) {
               <option value="" <?php if ($availability == '') echo 'selected'; ?>>ALL</option>
               <option <?php if ($availability == 'Now Showing') echo 'selected'; ?>>Now Showing</option>
               <option <?php if ($availability == 'Coming Soon') echo 'selected'; ?>>Coming Soon</option>
-              <option <?php if ($availability == 'Not Available') echo 'selected'; ?>>Not Available</option>
+            
             </select>
           </div>
           <div class="filter-group">
