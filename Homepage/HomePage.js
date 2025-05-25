@@ -51,7 +51,6 @@ const comingSoonPosterImages = [
   '../background/gladiator_ii.jpg',
   '../background/longlegs.jpg',
   '../background/maxxxine_ver2.jpg',
-  '../background/minecraft_the_movie_ver3.jpg',
   '../background/nobody_two_ver2.jpg',
   '../background/smurfs_ver3.jpg',
   '../background/thunderbolts_ver10.jpg'
