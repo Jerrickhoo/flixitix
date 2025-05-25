@@ -125,17 +125,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             top: 20%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 800px;
-            height: 800px;
-            opacity: 0.8;
+            width: 400px;
+            height: 375px;
+           
             background: url('Pictures/LoginLogo.png') no-repeat center center;
             background-size: contain;
             z-index: 10;
             filter: brightness(150%);
             pointer-events: none;
         }
-        .login-box,
-        .signup-form {
+        .login-box {
             position: absolute;
             width: 350px;
             top: 50%;
@@ -150,6 +149,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
             pointer-events: none;
             transition: transform 0.5s ease, opacity 0.5s ease;
             border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .signup-form {
+            position: absolute;
+            width: 350px;
+            top: 54%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(44, 44, 44, 0.92); /* slightly different for distinction */
+            backdrop-filter: blur(5px);
+            padding: 44px 40px 40px 40px;
+            border-radius: 12px;
+            color: #f5f5f5;
+            opacity: 0;
+            pointer-events: none;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+            border: 2px solid rgba(255, 0, 0, 0.15);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
         }
         .login-box.active,
         .signup-form.active {
