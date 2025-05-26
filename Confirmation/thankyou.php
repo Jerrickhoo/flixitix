@@ -199,12 +199,21 @@ if ($ticket_details) {
     <div class="detail-row">
       <span class="label">Price per seat:</span>
       <span class="value"><u><b>₱<?php echo number_format($movie_price, 2); ?></b></u></span>
-    </div>
-    <div class="detail-row">
+    </div>    <div class="detail-row">
       <span class="label">Total price:</span>
       <span class="value"><u><b>₱<?php echo number_format($movie_price * count($seats), 2); ?></b></u></span>
     </div>
   </div>
+  <div class="qr-code-wrapper">
+    <div class="qr-code-section">
+      <img src="../Pictures/QR_Code_Picture.jpeg" alt="Booking QR Code" class="qr-code-image">
+      <div class="qr-code-instructions">
+        <p class="verification-text">Please present this QR code at the cinema payment centers for verification</p>
+        <p class="save-text">Save or screenshot this page</p>
+      </div>
+    </div>
+  </div>
+
   <?php if ($show_confirm_form): ?>
   <form method="post" style="margin-top:24px;">
     <input type="hidden" name="confirm_booking" value="1">

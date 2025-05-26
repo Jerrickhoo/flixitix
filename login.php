@@ -122,15 +122,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         }
         .background-logo {
             position: fixed;
-            top: 20%;
+            top: 17%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 400px;
-            height: 375px;
-           
+            width: 350px;
+            height: 300px;
             background: url('Pictures/LoginLogo.png') no-repeat center center;
             background-size: contain;
-            z-index: 10;
+            z-index: -1;
             filter: brightness(150%);
             pointer-events: none;
         }
@@ -153,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         .signup-form {
             position: absolute;
             width: 350px;
-            top: 54%;
+            top: 55%;
             left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(44, 44, 44, 0.92); /* slightly different for distinction */

@@ -67,40 +67,28 @@ document.addEventListener('DOMContentLoaded', function() {
     seatMap.appendChild(sectionDiv);
   });
 
-  // Multi-seat booking logic
-  let multiSeatMode = false;
-  let multiSeatLimit = 1;
-  const multiSeatToggle = document.getElementById('multi-seat-toggle');
-  const multiSeatCount = document.getElementById('multi-seat-count');
-  const multiSeatHint = document.getElementById('multi-seat-hint');
+  // Seat count logic
+  let seatLimit = 1;
+  const seatCount = document.getElementById('multi-seat-count');
 
-  multiSeatToggle.addEventListener('change', function() {
-    multiSeatMode = this.checked;
-    multiSeatCount.style.display = multiSeatMode ? 'inline-block' : 'none';
-    multiSeatHint.style.display = multiSeatMode ? 'inline' : 'none';
-    multiSeatLimit = multiSeatMode ? parseInt(multiSeatCount.value) : 1;
-    // Deselect extra seats if needed
-    enforceSeatLimit();
-    updateConfirmBtn();
-  });
-  multiSeatCount.addEventListener('input', function() {
+  seatCount.addEventListener('input', function() {
     let val = parseInt(this.value);
     if (isNaN(val) || val < 1) val = 1;
     if (val > 10) val = 10;
     this.value = val;
-    multiSeatLimit = val;
+    seatLimit = val;
     enforceSeatLimit();
     updateConfirmBtn();
   });
   function enforceSeatLimit() {
     const selected = document.querySelectorAll('.seat.selected');
-    if (selected.length > multiSeatLimit) {
-      // Deselect extras
-      Array.from(selected).slice(multiSeatLimit).forEach(seat => seat.classList.remove('selected'));
+    if (selected.length > seatLimit) {
+      // Deselect extras from the end
+      Array.from(selected).slice(seatLimit).forEach(seat => seat.classList.remove('selected'));
     }
   }
 
-  // Seat selection logic (allow multiple, limit by multiSeatLimit)
+  // Seat selection logic
   seatMap.addEventListener('click', function(e) {
     if (
       e.target.classList.contains('seat') &&
@@ -108,50 +96,96 @@ document.addEventListener('DOMContentLoaded', function() {
       !e.target.classList.contains('unavailable') &&
       !e.target.disabled
     ) {
-      if (multiSeatMode) {
-        // Toggle selection, but limit to multiSeatLimit
-        if (e.target.classList.contains('selected')) {
-          e.target.classList.remove('selected');
-        } else {
-          const selected = document.querySelectorAll('.seat.selected');
-          if (selected.length < multiSeatLimit) {
-            e.target.classList.add('selected');
-          }
-        }
+      // Allow selection and deselection up to seat limit
+      if (e.target.classList.contains('selected')) {
+        e.target.classList.remove('selected');
       } else {
-        // Single seat mode
-        document.querySelectorAll('.seat.selected').forEach(seat => seat.classList.remove('selected'));
-        e.target.classList.add('selected');
+        const selected = document.querySelectorAll('.seat.selected');
+        if (selected.length < seatLimit) {
+          e.target.classList.add('selected');
+        }
       }
       updateConfirmBtn();
     }
   });
 
-  // Confirm button logic (submit all selected seats)
+  // Payment modal elements
+  const paymentModal = document.getElementById('payment-modal');
+  const modalTotalPrice = document.getElementById('modal-total-price');
+  const gcashButton = document.getElementById('gcash-button');
+  const cancelPaymentBtn = document.getElementById('cancel-payment');
+
+  // Confirm button logic (show payment modal)
   const confirmBtn = document.getElementById('seat-confirm-btn');
   function updateConfirmBtn() {
     const selected = document.querySelectorAll('.seat.selected');
     confirmBtn.disabled = selected.length === 0;
+    
+    // Update total price
+    const totalPrice = selected.length * TICKET_PRICE;
+    document.getElementById('total-price').textContent = totalPrice.toFixed(2);
+    modalTotalPrice.textContent = totalPrice.toFixed(2);
   }
+
+  // Show confirmation modal when confirm button is clicked
   confirmBtn.addEventListener('click', function() {
     const selected = document.querySelectorAll('.seat.selected');
     if (selected.length === 0) {
       console.log("No seat selected.");
       return;
     }
-    // Remove previous seat inputs
-    const container = document.getElementById('selected-seats-container');
-    container.innerHTML = '';
-    // Add a hidden input for each selected seat
-    selected.forEach(seat => {
-      const seatValue = seat.dataset.row + seat.textContent;
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'seat[]';
-      input.value = seatValue;
-      container.appendChild(input);
-    });
-    document.getElementById('seat-confirm-form').submit();
+    
+    // Update total price display
+    const totalPrice = (selected.length * TICKET_PRICE).toFixed(2);
+    document.getElementById('modal-total-price').textContent = totalPrice;
+    
+    paymentModal.style.display = 'flex';
   });
+
+  // Handle booking confirmation
+  gcashButton.addEventListener('click', async function() {
+    // Show processing state
+    const originalText = this.innerHTML;
+    this.disabled = true;
+    this.innerHTML = `
+      <div class="loading-spinner"></div>
+      Processing...
+    `;
+
+    try {
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Prepare form submission
+      const container = document.getElementById('selected-seats-container');
+      container.innerHTML = '';
+      const selected = document.querySelectorAll('.seat.selected');
+      selected.forEach(seat => {
+        const seatValue = seat.dataset.row + seat.textContent;
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'seat[]';
+        input.value = seatValue;
+        container.appendChild(input);
+      });
+
+      // Submit form
+      document.getElementById('seat-confirm-form').submit();
+    } catch (error) {
+      console.error('Payment failed:', error);
+      alert('Payment processing failed. Please try again.');
+      
+      // Reset button state
+      this.disabled = false;
+      this.innerHTML = originalText;
+    }
+  });
+
+  // Close payment modal
+  cancelPaymentBtn.addEventListener('click', function() {
+    paymentModal.style.display = 'none';
+  });
+
+  // Initialize confirm button state
   updateConfirmBtn();
 });

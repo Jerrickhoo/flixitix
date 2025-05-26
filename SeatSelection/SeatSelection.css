@@ -279,7 +279,7 @@ footer {
   display: inline-flex;
   align-items: center;
   position: absolute;
-  bottom: -200px;
+  bottom: -250px;
   left: 32px;
   background: rgba(24,24,24,0.92);
   color: #fff;
@@ -319,4 +319,127 @@ footer {
   text-decoration: underline;
   text-underline-offset: 6px;
   text-decoration-thickness: 2.5px;
+}
+
+/* Payment Modal Styles */
+.payment-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.payment-modal {
+  background: #222;
+  padding: 30px;
+  border-radius: 10px;
+  min-width: 320px;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.payment-modal h2 {
+  color: #fff;
+  margin: 0 0 20px 0;
+  font-size: 1.5rem;
+}
+
+.payment-amount {
+  background: #333;
+  padding: 15px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1.2rem;
+  margin-bottom: 25px;
+}
+
+.payment-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.confirm-booking-btn {
+  display: inline-block;
+  background: #e50914;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(229, 9, 20, 0.2);
+  width: 100%;
+}
+
+.confirm-booking-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(229, 9, 20, 0.3);
+  background: #cc0812;
+}
+
+.confirm-booking-btn:disabled {
+  opacity: 0.8;
+  cursor: wait;
+  transform: none;
+}
+
+.loading-spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.cancel-payment-btn {
+  background: transparent;
+  border: 2px solid #666;
+  color: #666;
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-payment-btn:hover {
+  border-color: #e50914;
+  color: #e50914;
+}
+
+.confirmation-message {
+  text-align: center;
+  margin: 20px 0;
+  color: #fff;
+}
+
+.confirmation-message p {
+  margin-bottom: 12px;
+  color: #bbb;
+  font-size: 1.1rem;
+}
+
+.modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
 }

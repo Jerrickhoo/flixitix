@@ -20,6 +20,19 @@ $screen_id = isset($_GET['screen_id']) ? intval($_GET['screen_id']) : 0;
 $show_date = isset($_GET['show_date']) ? $_GET['show_date'] : '';
 $show_time = isset($_GET['show_time']) ? $_GET['show_time'] : '';
 
+// Get movie price
+$movie_price = 0;
+if ($movie_id) {
+    $stmt = $conn->prepare("SELECT price FROM movies WHERE movie_id = ?");
+    $stmt->bind_param("i", $movie_id);
+    $stmt->execute();
+    $stmt->bind_result($price);
+    if ($stmt->fetch()) {
+        $movie_price = $price;
+    }
+    $stmt->close();
+}
+
 // Fetch booked seats for this showtime
 $booked_seats = [];
 if ($movie_id && $cinema_id && $screen_id && $show_date && $show_time) {
@@ -40,10 +53,10 @@ if ($movie_id && $cinema_id && $screen_id && $show_date && $show_time) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Seat Selection</title>
   <link rel="stylesheet" href="../Homepage/Homepage.css">
-  <link rel="stylesheet" href="SeatSelection.css">
-  <script>
-    // Pass booked seats from PHP to JS
+  <link rel="stylesheet" href="SeatSelection.css">  <script>
+    // Pass booked seats and price from PHP to JS
     const BOOKED_SEATS = <?php echo json_encode($booked_seats); ?>;
+    const TICKET_PRICE = <?php echo json_encode($movie_price); ?>;
   </script>
 </head>
 <body>
@@ -97,23 +110,41 @@ if ($movie_id && $cinema_id && $screen_id && $show_date && $show_time) {
         |
         <?php echo htmlspecialchars(date('g:i A', strtotime($show_time))); ?>
       </div>
-    <?php endif; ?>
-    <div class="seat-booking-options" style="text-align:center; margin-bottom:18px;">
-      <label style="font-weight:600; color:#fff; margin-right:10px;">
-        <input type="checkbox" id="multi-seat-toggle" style="margin-right:6px;"> Book multiple seats
+    <?php endif; ?>    <div class="seat-booking-options" style="text-align:center; margin-bottom:18px;">
+      <label style="font-weight:600; color:#fff; display: flex; align-items: center; justify-content: center; gap: 12px;">
+        Number of Seats:
+        <input type="number" id="multi-seat-count" min="1" max="10" value="1" style="width:60px; padding:4px 8px; border-radius:4px; border:1px solid #333; background: #333; color: #fff; font-size: 1rem;">
+        <span style="color:#bbb; font-size:0.9rem; font-weight: 400;">(Max: 10)</span>
       </label>
-      <input type="number" id="multi-seat-count" min="1" max="10" value="1" style="width:60px; display:none; margin-left:8px; padding:4px 8px; border-radius:4px; border:1px solid #888;">
-      <span id="multi-seat-hint" style="color:#fff; font-size:0.98rem; margin-left:10px; display:none;">How many seats? (1-10)</span>
     </div>
     <div class="seat-legend">
       <span class="seat-legend-item unavailable"><span class="seat-box">1</span> UNAVAILABLE</span>
       <span class="seat-legend-item available"><span class="seat-box">1</span> AVAILABLE</span>
-    </div>
-    <div class="seat-screen">SCREEN</div>
+    </div>    <div class="seat-screen">SCREEN</div>
     <div id="seat-map" class="seat-map"></div>
+    <div style="text-align: center; margin-top: 30px; color: #fff; font-size: 1rem;">
+      Total Price: ₱<span id="total-price">0.00</span>
+    </div>
   </main>
   <div class="seat-confirm-container">
     <button id="seat-confirm-btn" class="seat-confirm-btn" disabled>Confirm Selection</button>
+  </div>  <!-- Confirmation Modal -->
+  <div id="payment-modal" class="payment-modal-overlay">
+    <div class="payment-modal">
+      <h2>Confirm Booking</h2>
+      <div class="payment-amount">
+        Total Amount: ₱<span id="modal-total-price">0.00</span>
+      </div>
+      <div class="confirmation-message">
+        <p>Are you sure you want to proceed with this booking?</p>
+      </div>
+      <div class="modal-buttons">
+        <button id="gcash-button" class="confirm-booking-btn">
+          Confirm Booking
+        </button>
+        <button id="cancel-payment" class="cancel-payment-btn">Cancel</button>
+      </div>
+    </div>
   </div>
 
   <footer>

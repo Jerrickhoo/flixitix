@@ -160,9 +160,9 @@ body {
 
 
 .profile-avatar:hover {
-  border-color: rgba(229, 9, 20, 0.7);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+  border-color: #444;
+  transform: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
 .profile-avatar:not(.selected):hover {
@@ -178,9 +178,7 @@ body {
   transition: transform 0.3s ease;
 }
 
-.profile-avatar:hover .profile-picture-img {
-  transform: scale(1.1);
-}
+
 
 .profile-info {
   flex: 1;
@@ -599,32 +597,37 @@ body {
   background: #222;
   border-radius: 12px;
   padding: 36px 32px 32px 32px;
-  min-width: 320px;
+  width: 500px;
   max-width: 96vw;
-  min-height: 180px;
-  max-height: 80vh;
-  overflow-y: auto;
   color: #fff;
   box-shadow: 0 4px 32px rgba(0,0,0,0.45);
   position: relative;
 }
 .transaction-modal-close {
   position: absolute;
-  top: 12px;
-  right: 18px;
-  background: none;
+  top: 16px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
   border: none;
   font-size: 2rem;
-  font-weight: bold;
+  font-weight: 500;
   border-radius: 50%;
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   z-index: 2;
-  transition: background 0.18s, color 0.18s;
+  transition: all 0.2s ease;
+  padding: 0;
+  line-height: 1;
 }
+
 .transaction-modal-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
   background: #e50914;
   color: #fff;
 }
@@ -773,11 +776,15 @@ body {
 }
 @media (max-width: 600px) {
   .transaction-modal-content {
-    padding: 1.2rem 0.7rem;
-    max-width: 95vw;
+    padding: 32px 20px 24px 20px;
+    max-width: 92vw;
+    margin: 16px;
   }
   #transaction-history-list {
     max-width: 98vw;
+  }
+  #modal-transaction-list {
+    font-size: 0.95rem;
   }
 }
 
@@ -1144,4 +1151,53 @@ footer {
   border-color: #444;
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+}
+
+/* QR Code Section in Modal */
+.modal-qr-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 24px;
+  padding: 24px;
+  background: #2a2c2d;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.modal-qr-image {
+  width: 180px;
+  height: 180px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  padding: 10px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.modal-qr-instructions {
+  color: #e0e0e0;
+}
+
+.modal-qr-instructions p {
+  margin: 8px 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .modal-qr-section {
+    padding: 16px;
+    margin-top: 16px;
+  }
+
+  .modal-qr-image {
+    width: 160px;
+    height: 160px;
+    margin-bottom: 12px;
+  }
+
+  .modal-qr-instructions p {
+    font-size: 1rem;
+  }
 }

@@ -23,7 +23,7 @@ $screen_id = isset($_GET['screen_id']) ? intval($_GET['screen_id']) : 0;
 $movie = null;
 $moviePosterUrl = '../Pictures/Placeholder1.png'; // default poster
 if ($movie_id > 0) {
-  $stmt = $conn->prepare("SELECT * FROM movies WHERE movie_id = ?");
+  $stmt = $conn->prepare("SELECT movie_id, title, duration, release_year, rating, genre, price FROM movies WHERE movie_id = ?");
   $stmt->bind_param("i", $movie_id);
   $stmt->execute();
   $result = $stmt->get_result();
@@ -139,24 +139,24 @@ if ($movie_id && $cinema_id && $screen_id) {
           </div>
           <div class="get-ticket-genre"><?php echo htmlspecialchars($movie['genre'] ?? ''); ?></div>
         </div>
-      </div>
-      <div class="get-ticket-cinema-row" style="display: flex; align-items: center; justify-content: center; gap: 18px;">
+      </div>      <div class="get-ticket-cinema-row" style="display: flex; align-items: center; justify-content: center; gap: 18px;">
         <div class="get-ticket-cinema-name">
           <?php echo htmlspecialchars($cinema_name); ?>
         </div>
-        <div id="showtimes-inline-list-container">
-        <?php if ($screen_id && count($showtimes) > 0): ?>
-          <div class="showtimes-inline-list">
-            <?php foreach ($showtimes as $idx => $show): ?>
-              <label class="showtime-inline-item">
-                <input type="radio" name="showtime_idx" value="<?php echo $idx; ?>" <?php if ($idx === 0) echo 'checked'; ?> form="showtime-form">
-                <?php echo htmlspecialchars(date('M d', strtotime($show['show_date']))); ?>
-                &nbsp;|&nbsp;
-                <?php echo htmlspecialchars(date('g:i A', strtotime($show['show_time']))); ?>
-              </label>
-            <?php endforeach; ?>
+        <div id="showtimes-inline-list-container" style="display: flex; align-items: center; gap: 20px;">
+          <?php if ($screen_id && count($showtimes) > 0): ?>
+            <div class="showtimes-inline-list">
+              <?php foreach ($showtimes as $idx => $show): ?>                <label class="showtime-inline-item">
+                  <input type="radio" name="showtime_idx" value="<?php echo $idx; ?>" <?php if ($idx === 0) echo 'checked'; ?> form="showtime-form" style="display: none;">                  <?php echo htmlspecialchars(date('M d', strtotime($show['show_date']))); ?>
+                  <span style="border-left: 2px solid #333; margin: 0 8px; height: 1em; display: inline-block; vertical-align: middle;"></span>
+                  <?php echo htmlspecialchars(date('g:i A', strtotime($show['show_time']))); ?>
+                </label>
+              <?php endforeach; ?>
+            </div>
+          <?php endif; ?>
+          <div class="get-ticket-price" style="font-size: 1rem; font-weight: 100; color:#fff; padding-left: 10px; border-left: 2px solid #333;">
+            ₱<?php echo number_format($movie['price'], 2); ?>
           </div>
-        <?php endif; ?>
         </div>
       </div>
       <form id="showtime-form" method="get" action="/flixitix/SeatSelection/SeatSelection.php">

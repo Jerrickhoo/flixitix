@@ -242,15 +242,19 @@ $stmt->close();
           <?php endif; ?>
         </div>
       </div>
-    </section>
-
-    <!-- Transaction Modal -->
+    </section>    <!-- Transaction Modal -->
     <div id="transaction-modal" class="transaction-modal">
       <div class="transaction-modal-content">
-        <span class="transaction-modal-close" id="transaction-modal-close">&times;</span>
+        <button class="transaction-modal-close" id="transaction-modal-close" aria-label="Close">&times;</button>
         <h2 id="modal-movie-title">Movie Title</h2>
         <div id="modal-transaction-list">
           <!-- Transaction details will be dynamically injected here -->
+        </div>
+        <div class="modal-qr-section">
+          <img src="../Pictures/QR_Code_Picture.jpeg" alt="Booking QR Code" class="modal-qr-image">
+          <div class="modal-qr-instructions">
+            <p>Present this QR code at the cinema payment centers for verification</p>
+          </div>
         </div>
       </div>
     </div>
