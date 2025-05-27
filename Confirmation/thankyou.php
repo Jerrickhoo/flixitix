@@ -165,13 +165,8 @@ if ($ticket_details) {
       <a href="../ProfilePage/ProfilePage.php" class="header-profile-link-rect" aria-label="Go to Profile Page">
         <img src="<?php echo htmlspecialchars($profile_picture); ?>" alt="User Profile" class="header-pfp">
         <span class="header-profile-text">Profile</span>
-      </a>
-    </div>
+      </a>    </div>
   </div>
-
-    <a href="../MovieMenu/Moviemenu.php" class="back-to-movie-menu-btn" aria-label="Back to Movies">
-    <span class="back-arrow" aria-hidden="true">&#8592;</span> <span class="back-label">Back to Movies</span>
-  </a>
 
   <main>
     <section class="thankyou-container">
