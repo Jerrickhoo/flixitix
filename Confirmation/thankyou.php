@@ -156,8 +156,7 @@ if ($ticket_details) {
       <span class="progress-step active">Get Ticket</span>
       <span class="progress-arrow active">&#8594;</span>
       <span class="progress-step active">Seat Selection</span>
-      <span class="progress-arrow active">&#8594;</span>
-      <span class="progress-step active" id="progress-confirmation">Confirmation</span>
+      <span class="progress-arrow active">&#8594;</span>      <span class="progress-step active" id="progress-confirmation">Summary</span>
     </div>
 
 

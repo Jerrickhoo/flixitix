@@ -81,7 +81,7 @@ if (isset($_SESSION['user_email'])) {
        <span class="progress-arrow">&#8594;</span>
        <span class="progress-step" >Seat Selection</span>
        <span class="progress-arrow">&#8594;</span>
-       <span class="progress-step" >Confirmation</span>
+       <span class="progress-step" >Summary</span>
     </div>
     <div class="header-profile">
       <a href="../ProfilePage/ProfilePage.php" class="header-profile-link-rect" aria-label="Go to Profile Page">

@@ -34,10 +34,9 @@ if (isset($_SESSION['user_email'])) {
     <span class="progress-step" id="progress-cinema">Cinema</span>
     <span class="progress-arrow">&#8594;</span>
     <span class="progress-step" id="progress-get-ticket">Get Ticket</span>
+    <span class="progress-arrow">&#8594;</span>    <span class="progress-step" id="progress-seat-selection">Seat Selection</span>
     <span class="progress-arrow">&#8594;</span>
-    <span class="progress-step" id="progress-seat-selection">Seat Selection</span>
-    <span class="progress-arrow">&#8594;</span>
-    <span class="progress-step" id="progress-confirmation">Confirmation</span>
+    <span class="progress-step" id="progress-confirmation">Summary</span>
   </div>
   <div class="header-profile">
     <a href="../ProfilePage/ProfilePage.php" class="header-profile-link-rect" aria-label="Go to Profile Page">
